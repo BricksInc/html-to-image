@@ -8,6 +8,7 @@ import {
 } from './util'
 import { getMimeType } from './mimes'
 import { resourceToDataURL } from './dataurl'
+import { applyCSSFixes } from './cssFixes'
 
 async function cloneCanvasElement(canvas: HTMLCanvasElement) {
   const dataURL = canvas.toDataURL()
@@ -136,11 +137,6 @@ function cloneCSSStyle<T extends HTMLElement>(
   } else {
     getStyleProperties(options).forEach((name) => {
       let value = sourceStyle.getPropertyValue(name)
-      if (name === 'font-size' && value.endsWith('px')) {
-        const reducedFont =
-          Math.floor(parseFloat(value.substring(0, value.length - 2))) - 0.1
-        value = `${reducedFont}px`
-      }
 
       if (
         isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
@@ -161,6 +157,8 @@ function cloneCSSStyle<T extends HTMLElement>(
       )
     })
   }
+
+  applyCSSFixes(nativeNode, clonedNode)
 }
 
 function cloneInputValue<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
