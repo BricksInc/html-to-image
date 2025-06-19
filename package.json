@@ -2,14 +2,8 @@
   "name": "html-to-image",
   "version": "1.11.13",
   "description": "Generates an image from a DOM node using HTML5 canvas and SVG.",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "unpkg": "dist/html-to-image.js",
-  "types": "lib/index.d.ts",
+  "main": "src/index.ts",
   "files": [
-    "dist",
-    "es",
-    "lib",
     "src"
   ],
   "keywords": [
@@ -34,8 +28,7 @@
     "test:watch": "karma start --single-run=false --auto-watch",
     "test:debug": "karma start --browsers=Chrome --single-run=false --auto-watch --debug",
     "coveralls": "cat ./test/coverage/lcov.info | coveralls",
-    "pretest": "rimraf ./test/coverage",
-    "prepare": "is-ci || husky install .husky"
+    "pretest": "rimraf ./test/coverage"
   },
   "lint-staged": {
     "**/*.{js,jsx,tsx,ts,less,md,json}": [
