@@ -67,24 +67,17 @@ async function cloneSingleNode<T extends HTMLElement>(
     return cloneIFrameElement(node, options)
   }
 
-  return node.cloneNode(isSVGElement(node)) as T
+  return node.cloneNode(false) as T
 }
 
 const isSlotElement = (node: HTMLElement): node is HTMLSlotElement =>
   node.tagName != null && node.tagName.toUpperCase() === 'SLOT'
-
-const isSVGElement = (node: HTMLElement): node is HTMLSlotElement =>
-  node.tagName != null && node.tagName.toUpperCase() === 'SVG'
 
 async function cloneChildren<T extends HTMLElement>(
   nativeNode: T,
   clonedNode: T,
   options: Options,
 ): Promise<T> {
-  if (isSVGElement(clonedNode)) {
-    return clonedNode
-  }
-
   let children: T[] = []
 
   if (isSlotElement(nativeNode) && nativeNode.assignedNodes) {
@@ -105,17 +98,15 @@ async function cloneChildren<T extends HTMLElement>(
     return clonedNode
   }
 
-  await children.reduce(
-    (deferred, child) =>
-      deferred
-        .then(() => cloneNode(child, options))
-        .then((clonedChild: HTMLElement | null) => {
-          if (clonedChild) {
-            clonedNode.appendChild(clonedChild)
-          }
-        }),
-    Promise.resolve(),
+  const clonedChildren = await Promise.all(
+    children.map((child) => cloneNode(child, options)),
   )
+
+  for (const child of clonedChildren) {
+    if (child) {
+      clonedNode.appendChild(child)
+    }
+  }
 
   return clonedNode
 }
