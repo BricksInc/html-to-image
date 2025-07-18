@@ -10,6 +10,8 @@ import {
   canvasToBlob,
   nodeToDataURL,
   checkCanvasDimensions,
+  sleep,
+  isSafari,
 } from './util'
 
 export async function toSvg<T extends HTMLElement>(
@@ -33,6 +35,14 @@ export async function toCanvas<T extends HTMLElement>(
   const svg = await toSvg(node, options)
   const img = await createImage(svg)
 
+  if (isSafari) {
+    // Safari needs to be forced to render the image before putting it in the canvas
+    // otherwise it won't load certain parts of the node (like images)
+    img.decoding = 'sync'
+    document.body.appendChild(img)
+    await sleep(2000)
+  }
+
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')!
   const ratio = options.pixelRatio || getPixelRatio()
@@ -54,6 +64,8 @@ export async function toCanvas<T extends HTMLElement>(
   }
 
   context.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+  img.remove()
 
   return canvas
 }

@@ -259,3 +259,9 @@ export const isInstanceOfElement = <
     isInstanceOfElement(nodePrototype, instance)
   )
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')

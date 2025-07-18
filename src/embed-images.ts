@@ -40,6 +40,11 @@ async function embedImageNode<T extends HTMLElement | SVGImageElement>(
 ) {
   const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement)
 
+  if (isImageElement) {
+    // Safari has a race condition with rendering images unless we set decoding to 'sync'
+    clonedNode.decoding = 'sync'
+  }
+
   if (
     !(isImageElement && !isDataUrl(clonedNode.src)) &&
     !(
@@ -60,16 +65,8 @@ async function embedImageNode<T extends HTMLElement | SVGImageElement>(
       resolve(ev);
     }
 
-    const image = clonedNode as HTMLImageElement
-    if (image.decode) {
-      image.decode = resolve as any
-    }
-
-    if (image.loading === 'lazy') {
-      image.loading = 'eager'
-    }
-
     if (isImageElement) {
+      clonedNode.loading = 'eager'
       clonedNode.srcset = ''
       clonedNode.src = dataURL
     } else {
